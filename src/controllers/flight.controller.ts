@@ -23,30 +23,6 @@ export const getDirectFlightsFromTo = async (req: Request, res: Response) : Prom
   }
 }
 
-// export const getFlightsByDateAndTime = async (req: Request, res: Response, next: NextFunction) : Promise<any> => {
-//   try {
-//     const departure = req.body.departureDestination;
-//     const arrival = req.body.arrivalDestination;
-//     const route = await connect(() => Routes.findOne({departureDestination:departure, arrivalDestination:arrival }).lean()) as IRoutes;
-//       if (!route) {
-//         close();
-//         const error = new Error ('No route found for this search') as IStatusError;
-//         error.status = 404
-//         next (error)
-//       } else {
-//         close();
-//         const flights = await connect(() => Itineraries.find({route:route.route_id}).lean()) as IItineraries[];
-//         close();
-//         console.log(flights);
-//         return res.status(200).json({...route ,flights:flights});
-//       }  
-//   } catch (error) {
-//       next (error)
-//   }
-// }
-
-
-
 export const getAllRoutesFromDepartureDestination = async (req: Request, res: Response) : Promise<any> => {
   try {
     const departure = req.body.departureDestination;
@@ -98,15 +74,22 @@ export const getAllFlightsFromTo = async (req: Request, res: Response) : Promise
     }
 
     for (const layover of routesWithLayover) {
+      
       layover.firstFlight = {};
       layover.secondFlight = {};
-      const flights = await connect(() => Itineraries.find( { route:{ $in: [ layover.firstRoute!.route_id, layover.secondRoute!.route_id ]}, departureAt: { $regex: date} },{_id:0}).lean()) as IItineraries[];
-      if(flights[0]!.availableSeats! <= 0) {layover.firstFlight.message = "No seats available"};
-      if(flights[1]!.availableSeats! <= 0) {layover.secondFlight.message = "No seats available"}; 
-      if(flights[0]!.availableSeats! > 0) {layover.firstFlight = flights[0]};
-      if(flights[1]!.availableSeats! > 0) {layover.secondFlight = flights[1]};        
+      const flight1 = await connect(() => Itineraries.find( { route:{ $in: [ layover.firstRoute!.route_id, layover.secondRoute!.route_id ]}, departureAt: { $regex: date} },{_id:0}).lean()) as IItineraries[];
+      const flight2 = await connect(() => Itineraries.find( { route:{ $in: [ layover.firstRoute!.route_id, layover.secondRoute!.route_id ]}, departureAt: { $gt: flight1[0]?.arrivalAt} },{_id:0}).lean()) as IItineraries[];
+      if(flight1[0]!.availableSeats! <= 0) {layover.firstFlight.message = "No seats available"};
+      if(flight2[0]!.availableSeats! <= 0) {layover.secondFlight.message = "No seats available"}; 
+      if(flight1[0]!.availableSeats! > 0) {layover.firstFlight = flight1[0]};
+      if(flight2[0]!.availableSeats! > 0) {layover.secondFlight = flight2[0]};
+      const arrivalTime = new Date(flight1[0]?.arrivalAt!);
+      const departureTime = new Date(flight2[0]?.arrivalAt!);
+      //@ts-ignore
+      layover.waitingTimeInHours = Math.floor((departureTime - arrivalTime) / (1000 * 60 * 60));  
     }
-      
+    
+
       return res.status(200).json(routesWithLayover); 
   } catch (error) {
     return res.send(error)
