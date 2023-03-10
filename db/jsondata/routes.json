@@ -1,0 +1,27 @@
+[
+  {
+      "route_id": "8efc39dd",
+      "departureDestination": "Oslo",
+      "arrivalDestination": "Stockholm"
+  },
+  {
+      "route_id": "42be9e9e",
+      "departureDestination": "Amsterdam",
+      "arrivalDestination": "Stockholm"
+  },
+  {
+      "route_id": "a35d65d2",
+      "departureDestination": "Stockholm",
+      "arrivalDestination": "Oslo"
+  },
+  {
+      "route_id": "52ec1574",
+      "departureDestination": "Stockholm",
+      "arrivalDestination": "Amsterdam"
+  },
+  {
+      "route_id": "c76824c1",
+      "departureDestination": "Amsterdam",
+      "arrivalDestination": "Oslo"
+  }
+]
