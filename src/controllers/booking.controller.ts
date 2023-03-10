@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { close, connect } from "../../db/mongo.config";
-import { IBooking } from "../types/types";
+import { IBooking, IItineraries } from "../types/types";
 import { Booking } from "../../db/models/booking.models";
+import { Itineraries } from "../../db/models/flight.models";
 
 
 export const getUserBookings = async (req: Request, res: Response) : Promise<any> => {
@@ -21,6 +22,9 @@ export const getUserBookings = async (req: Request, res: Response) : Promise<any
 export const addBooking = async (req: Request, res: Response) : Promise<any> => {
   try {
     await connect(() => Booking.create({...req.body})) as IBooking;
+    const flights = await connect(() => Itineraries.findOne({flight_id: req.body.flight_id},{_id:0}).lean()) as IItineraries;
+    await connect(() => Itineraries.updateOne({ flight_id: req.body.flight_id }, { availableSeats: flights.availableSeats! - 1 })) as IItineraries;
+    console.log(flights, 'flight');
     close()
     return res.sendStatus(201);
   } catch (error) {
