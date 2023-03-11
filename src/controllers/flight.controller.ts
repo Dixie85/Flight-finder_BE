@@ -75,6 +75,7 @@ export const getAllFlightsFromTo = async (req: Request, res: Response) : Promise
 
     for (const layover of routesWithLayover) {
       
+      layover.routeSearchInfo = { departureFrom: departure, arrivalAt: arrival };
       layover.firstFlight = {};
       layover.secondFlight = {};
       const flight1 = await connect(() => Itineraries.find( { route:{ $in: [ layover.firstRoute!.route_id, layover.secondRoute!.route_id ]}, departureAt: { $regex: date} },{_id:0}).lean()) as IItineraries[];
@@ -88,9 +89,13 @@ export const getAllFlightsFromTo = async (req: Request, res: Response) : Promise
       //@ts-ignore
       layover.waitingTimeInHours = Math.floor((departureTime - arrivalTime) / (1000 * 60 * 60));  
     }
+    close()
     
-
-      return res.status(200).json(routesWithLayover); 
+    if (!directRoute) {
+      return res.status(200).json(routesWithLayover);
+    } else {
+      return res.status(200).json([directRoute, ...routesWithLayover]); 
+    } 
   } catch (error) {
     return res.send(error)
   }

@@ -35,12 +35,18 @@ export interface IRoutes {
   //   firstFlight?: string;
   //   secondFlight?: string;
   // }
+
+  export interface IRouteInfo {
+    departureFrom?: string;
+    arrivalAt?: string;
+  }
   
   export interface ILayover {
-    firstRoute?: IRoutes,
-    secondRoute?: IRoutes,
-    firstFlight?: IItineraries,
-    secondFlight?: IItineraries
+    routeSearchInfo?: IRouteInfo;
+    firstRoute?: IRoutes;
+    secondRoute?: IRoutes;
+    firstFlight?: IItineraries;
+    secondFlight?: IItineraries;
   }
   
   //Booking Interface
