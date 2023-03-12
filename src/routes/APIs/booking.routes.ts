@@ -3,7 +3,7 @@ import {Router} from "express";
 
 export const booking = Router()
 
-booking.get("/booking/bookings", getUserBookings);
+booking.post("/booking/bookings", getUserBookings);
 
 booking.post("/booking/new", addBooking);
 

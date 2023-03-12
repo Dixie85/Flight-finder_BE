@@ -4,10 +4,10 @@ import { getAllFlightsFromTo, getAllRoutesFromDepartureDestination, getDirectFli
 export const flight = Router()
 
 
-flight.get("/flight/from", getAllRoutesFromDepartureDestination);
+flight.post("/flight/from", getAllRoutesFromDepartureDestination);
 
-flight.get("/flight/direct", getDirectFlightsFromTo);
+flight.post("/flight/direct", getDirectFlightsFromTo);
 
-flight.get("/flight/all", getAllFlightsFromTo);
+flight.post("/flight/all", getAllFlightsFromTo);
 
 export default flight
